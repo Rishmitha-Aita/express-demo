@@ -3,8 +3,14 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 
+const PORT = process.env.PORT || 3000;
+
+const debug = require('debug')('app:startup');
+
 const app = express();
 
+// to enable export as env varibale like export DEBUG=app.startup
+debug('Debugging.....');
 // built-in middleware
 
 // navigate to index1.html as localhost:port/index1.html
@@ -22,14 +28,18 @@ app.use(logger);
 
 // third party middleware morgan
 // prints out every request accessed in server//logging http requests
-app.use(morgan('dev'));
-
+if (app.get('env') === 'development') {
+  app.use(morgan('tiny'));
+  console.log('Morgan enabled...');
+}
 // third party middleware helmet
 // secures express apps by setting various http headers , to avoid exposing express
 // in header section
 app.use(helmet());
 
 app.set('view engine', 'ejs');
+
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 app.get('/', (req, res) => {
   console.log('orginalUrl', req.originalUrl);
@@ -51,4 +61,4 @@ function logger(req, res, next) {
   next();
 }
 
-app.listen(3000);
+app.listen(PORT);
